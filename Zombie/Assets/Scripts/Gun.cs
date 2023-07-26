@@ -32,24 +32,75 @@ public class Gun : MonoBehaviour {
 
     private void Awake() {
         // 사용할 컴포넌트의 참조 가져오기
+        gunAudioPlayer = GetComponent<AudioSource>();
+        bulletLineRenderer = GetComponent<LineRenderer>();
+
+        bulletLineRenderer.positionCount = 2;
+        bulletLineRenderer.enabled = false;
+
     }
 
     private void OnEnable() {
         // 총 상태 초기화
+        ammoRemain = gunData.startAmmoRemain;
+        magAmmo = gunData.magCapacity;
+
+        state = State.Ready;
+        lastFireTime = 0f;
     }
 
     // 발사 시도
     public void Fire() {
+        if (state.Equals(State.Ready) && lastFireTime + gunData.timeBetFire <= Time.time)
+        {
+            lastFireTime = Time.time;
+            Shot();
+        }
 
     }
 
     // 실제 발사 처리
     private void Shot() {
-      
+        RaycastHit hit;
+        Vector3 hitPosition = Vector3.zero;
+
+        // Physics.Raycast는 기본적으로 true값을 가지고있다 (?)
+        if (Physics.Raycast(fireTransform.position, fireTransform.forward, out hit, fireDistance))
+        {
+            // 좀비 서바이벌에서 건저야 할 가장 중요한 포인트
+            // 충돌한 상태로부터 IDamageble 오브젝트 가져오기 시도
+            IDamageable target = hit.collider.GetComponent<IDamageable>(); 
+
+            if (target != null) // 값이 있으면
+            {
+                target.OnDamage(gunData.damage, hit.point, hit.normal); // 데미지를 넣는다.
+            }
+            hitPosition = hit.point;    
+        }
+        else
+        {
+            hitPosition = fireTransform.position + fireTransform.forward * fireDistance;
+        }
+
+        StartCoroutine(ShotEffect(hitPosition));
+
+        magAmmo -= 1;   // 총알 하나 없애기
+        if (magAmmo <= 0)
+        {
+            state = State.Empty;    // 총알이 0과 같거나 작으면 비어있는 상태로 전이
+        }
+
     }
 
     // 발사 이펙트와 소리를 재생하고 탄알 궤적을 그림
     private IEnumerator ShotEffect(Vector3 hitPosition) {
+        muzzleFlashEffect.Play();
+        shellEjectEffect.Play();
+        gunAudioPlayer.PlayOneShot(gunData.shotClip);
+
+        bulletLineRenderer.SetPosition(0, fireTransform.position);
+        bulletLineRenderer.SetPosition(1, hitPosition);
+
         // 라인 렌더러를 활성화하여 탄알 궤적을 그림
         bulletLineRenderer.enabled = true;
 
@@ -62,6 +113,12 @@ public class Gun : MonoBehaviour {
 
     // 재장전 시도
     public bool Reload() {
+        if (state.Equals(State.Reloading) || ammoRemain <= 0 || gunData.magCapacity <= magAmmo)
+        {
+            return false;
+        }
+
+        StartCoroutine(ReloadRoutine());
         return false;
     }
 
@@ -69,11 +126,22 @@ public class Gun : MonoBehaviour {
     private IEnumerator ReloadRoutine() {
         // 현재 상태를 재장전 중 상태로 전환
         state = State.Reloading;
+        gunAudioPlayer.PlayOneShot(gunData.reloadClip);
       
         // 재장전 소요 시간 만큼 처리 쉬기
         yield return new WaitForSeconds(gunData.reloadTime);
 
+        int ammoToFill = gunData.magCapacity - magAmmo;
+
+        if (ammoRemain < ammoToFill)
+        {
+            ammoToFill = ammoRemain;
+        }
+        magAmmo += ammoRemain;
+        ammoRemain *= ammoToFill;
+
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;
+
     }
 }
