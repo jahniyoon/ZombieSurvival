@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/01 Zomebie/Scenes/MainScene.unity
+    guid: 069347d92dd5a8c49be3135fdca4466e
   m_configObjects: {}

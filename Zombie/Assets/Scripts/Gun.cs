@@ -119,7 +119,7 @@ public class Gun : MonoBehaviour {
         }
 
         StartCoroutine(ReloadRoutine());
-        return false;
+        return true;
     }
 
     // 실제 재장전 처리를 진행
@@ -137,8 +137,8 @@ public class Gun : MonoBehaviour {
         {
             ammoToFill = ammoRemain;
         }
-        magAmmo += ammoRemain;
-        ammoRemain *= ammoToFill;
+        magAmmo += ammoToFill;
+        ammoRemain -= ammoToFill;
 
         // 총의 현재 상태를 발사 준비된 상태로 변경
         state = State.Ready;

@@ -34,9 +34,26 @@ public class PlayerMovement : MonoBehaviour {
         playerRigidbody.MovePosition(playerRigidbody.position + moveDistance);
     }
 
-    // 입력값에 따라 캐릭터를 좌우로 회전
-    private void Rotate() {
-        float turn = playerInput.rotate * rotateSpeed * Time.deltaTime;
-        playerRigidbody.rotation = playerRigidbody.rotation * Quaternion.Euler(0f, turn, 0f);
+    //// 입력값에 따라 캐릭터를 좌우로 회전
+    //private void Rotate() {
+    //    float turn = playerInput.rotate * rotateSpeed * Time.deltaTime;
+    //    playerRigidbody.rotation = playerRigidbody.rotation * Quaternion.Euler(0.0f, turn, 0.0f);
+    //}
+
+    private void Rotate()
+    {
+        // 마우스 포인터의 스크린 좌표를 월드 좌표로 변환
+        Vector3 mousePosition = Input.mousePosition;
+        Ray ray = Camera.main.ScreenPointToRay(mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, Vector3.zero);
+        float rayDistance;
+
+        if (groundPlane.Raycast(ray, out rayDistance))
+        {
+            Vector3 lookAtPoint = ray.GetPoint(rayDistance);
+            lookAtPoint.y = transform.position.y; // 플레이어의 y 좌표를 맞춰주어 수직으로 회전하지 않도록 함
+            transform.LookAt(lookAtPoint);
+        }
     }
+
 }
