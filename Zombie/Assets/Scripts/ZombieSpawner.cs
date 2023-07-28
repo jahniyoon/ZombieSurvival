@@ -13,9 +13,11 @@ public class ZombieSpawner : MonoBehaviour {
 
     private void Awake()
     {
-        zombieDatas[0] = ResourceManager.instance.zombieData_Default;
-        zombieDatas[1] = ResourceManager.instance.zombieData_Default;
-        zombieDatas[2] = ResourceManager.instance.zombieData_Default;
+
+        //ReadCsv();
+        zombieDatas[0] = ResourceManager.instance.zombieData_default;
+        zombieDatas[1] = ResourceManager.instance.zombieData_default;
+        zombieDatas[2] = ResourceManager.instance.zombieData_default;
     }
 
     private void Update() {
@@ -57,7 +59,8 @@ public class ZombieSpawner : MonoBehaviour {
     // 좀비를 생성하고 생성한 좀비에게 추적할 대상을 할당
     private void CreateZombie() {
 
-        ZombieData zombieData = zombieDatas[Random.Range(0, zombieDatas.Length)];
+        ZombieData2 zombieData = ResourceManager.instance.zombieDatas[
+            Random.Range(0, ResourceManager.instance.zombieDatas.Count)];
         Transform spawnPoint = spawnPoints[Random.Range(0, spawnPoints.Length)];
         Zombie zombie = Instantiate(zombiePrefab, spawnPoint.position, spawnPoint.rotation);
 
@@ -68,4 +71,6 @@ public class ZombieSpawner : MonoBehaviour {
         zombie.onDeath += () => Destroy(zombie.gameObject, 10f);
         zombie.onDeath += () => GameManager.instance.AddScore(100);
     }
+
+   
 }

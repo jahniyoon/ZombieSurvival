@@ -1,11 +1,12 @@
+using System.IO;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-//using UnityEditor; // 빌드가 안된다. using 네임스페이스중에는 빌드가 안되는 친구들이 있다.
+//using UnityEditor;
 
 public class ResourceManager : MonoBehaviour
 {
-    private static ResourceManager m_instance;
+    private static ResourceManager m_instance; // 싱글톤이 할당될 static 변수
     public static ResourceManager instance
     {
         get
@@ -22,45 +23,45 @@ public class ResourceManager : MonoBehaviour
         }
     }
 
-    //private string dataPath
     private static string zombieDataPath = default;
-    public ZombieData zombieData_Default = default;
 
+    public ZombieData zombieData_default = default;
+
+    public List<ZombieData2> zombieDatas = default;
 
     private void Awake()
     {
-        //dataPath = Application.dataPath;
-        //zombieDataPath = string.Format("{0}/{1}", dataPath, "01 Zomebie/Scriptables");
+        //ZombieDatas 초기화
+        zombieDatas = new List<ZombieData2>();
 
-        //byte[] byteZombieData = File.ReadAllBytes(zombieDataPath + "/Zombie Data Default");
+        zombieDataPath = "ZombieDatas";
+        zombieDataPath = string.Format("{0}/{1}", zombieDataPath, "ZombieSurvival Datas - ZombieDatas"); //이 왼쪽에 좀비데이터 엑셀파일 이름 적으세요
 
-        //ZombieData zombieData_ = AssetDatabase.LoadAssetAtPath<ZombieData>(zombieDataPath);
-       
-        zombieDataPath = "Scriptables";
-        zombieDataPath = string.Format("{0}/{1}", zombieDataPath, "Zombie Data Default");
+        TextAsset csvZombieData = Resources.Load<TextAsset>(zombieDataPath);
 
-        zombieData_Default = Resources.Load<ZombieData>(zombieDataPath);
+        string[] zombieDatas_str = csvZombieData.text.Split('\n');
+        ZombieData2 loadZombieData = default;
+        for (int i = 1; i < zombieDatas_str.Length; i++)
+        {
+            loadZombieData = new ZombieData2(zombieDatas_str[i]);
+            zombieDatas.Add(loadZombieData);
 
-        Debug.LogFormat("게임 Save date 를 여기에다가 저장하는 것이 상식이다. => {0}", Application.persistentDataPath);
-
-        //zombieData_Default = AssetDatabase.LoadAssetAtPath<ZombieData>(zombieDataPath);
-        //ZombieData zombieData_ = Resources.Load<ZombieData>(zombieDataPath);
-
-
-        //Debug.LogFormat("Zombie Data Path : {0}", zombieDataPath);
-        //Debug.LogFormat("Zombie data : {0}, {1}, {2}",
-        //    zombieData_.health, zombieData_.damage, zombieData_.speed);
-        
+        }
     }
+
+
+
+
+
     // Start is called before the first frame update
     void Start()
     {
-        
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }
