@@ -35,8 +35,7 @@ public class ResourceManager : MonoBehaviour
         zombieDatas = new List<ZombieData2>();
 
         zombieDataPath = "ZombieDatas";
-        zombieDataPath = string.Format("{0}/{1}", zombieDataPath, "ZombieSurvival Datas - ZombieDatas"); //이 왼쪽에 좀비데이터 엑셀파일 이름 적으세요
-
+        zombieDataPath = string.Format("{0}/{1}", zombieDataPath, "ZombieSurvival Datas"); //이 왼쪽에 좀비데이터 엑셀파일 이름 적으세요
         TextAsset csvZombieData = Resources.Load<TextAsset>(zombieDataPath);
 
         string[] zombieDatas_str = csvZombieData.text.Split('\n');
